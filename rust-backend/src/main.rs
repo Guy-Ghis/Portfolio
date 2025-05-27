@@ -21,8 +21,14 @@ async fn main() {
     tracing::debug!("listening on {}", addr);
     
     // Updated server binding syntax for Axum 0.7
-    let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
-    axum::serve(listener, app).await.unwrap();
+    let listener = tokio::net::TcpListener::bind(addr)
+        .await
+        .expect("Failed to bind to address");
+    
+    if let Err(e) = axum::serve(listener, app).await {
+        tracing::error!("Server error: {}", e);
+        std::process::exit(1);
+    }
 }
 
 // Basic health check endpoint
